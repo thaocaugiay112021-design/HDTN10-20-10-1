@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trò Chơi Ma Trận Sắc Màu 20-10 & Trắc Nghiệm HĐTN 10 KNTT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Orbitron:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      user-select: none;
+    }
+    .font-art {
+      font-family: 'Dancing Script', cursive;
+    }
+    .font-matrix {
+      font-family: 'Orbitron', monospace;
+    }
+    .neon-text-glow {
+      text-shadow: 0 0 10px rgba(244, 63, 94, 0.8), 0 0 25px rgba(236, 72, 153, 0.9), 0 0 45px rgba(168, 85, 247, 0.9);
+    }
+    .neon-box-glow {
+      box-shadow: 0 0 25px rgba(244, 63, 94, 0.35), inset 0 0 15px rgba(168, 85, 247, 0.2);
+    }
+    .glassmorphism {
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .flower-bounce {
+      animation: gentleFloat 3.5s ease-in-out infinite alternate;
+    }
+    @keyframes gentleFloat {
+      0% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(1deg); }
+      100% { transform: translateY(0px) rotate(-1deg); }
+    }
+    .scale-pulse {
+      animation: pulseGrow 1.8s infinite ease-in-out;
+    }
+    @keyframes pulseGrow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    ::-webkit-scrollbar {
+      width: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090d16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ec4899;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen overflow-x-hidden relative selection:bg-pink-500 selection:text-white">
+
+  <!-- Ma trận sắc màu Canvas Background -->
+  <canvas id="matrixCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-45"></canvas>
+  <!-- Confetti Canvas cho lúc chiến thắng -->
+  <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+  <div class="relative z-10 flex flex-col min-h-screen">
+    
+    <!-- Top Bar: Âm thanh & Điều khiển Ma Trận -->
+    <header class="w-full max-w-6xl mx-auto px-4 pt-3 pb-1 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></span>
+        <span class="text-xs font-semibold text-emerald-400 tracking-wider">HĐTN 10 &bull; KNTT</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="btnSound" onclick="toggleSound()" class="px-3 py-1.5 rounded-lg glassmorphism text-xs font-medium text-pink-300 hover:text-white border border-pink-500/30 flex items-center gap-1.5 transition">
+          <span id="soundIcon">🔊</span> <span id="soundLabel">Âm thanh: Bật</span>
+        </button>
+        <button onclick="toggleMatrixSpeed()" class="px-3 py-1.5 rounded-lg glassmorphism text-xs font-medium text-purple-300 hover:text-white border border-purple-500/30 transition">
+          Ma trận: <span id="matrixSpeedLabel">Bình thường</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero Banner: Bó hoa tươi thắm & Chữ 20-10 Phát Sáng -->
+    <section class="w-full px-4 pt-2 pb-4 flex flex-col items-center justify-center text-center">
+      
+      <!-- Bó hoa tươi thắm rực rỡ với vườn hoa nở theo câu trả lời đúng -->
+      <div class="flower-bounce relative group cursor-pointer" onclick="showLoveMessage()" title="Nhấp vào bó hoa để nhận thông điệp 20-10 bất ngờ!">
+        <div class="absolute -inset-5 bg-gradient-to-r from-pink-500 via-rose-500 to-amber-300 rounded-full blur-2xl opacity-40 group-hover:opacity-75 transition duration-500"></div>
+        
+        <svg class="w-48 h-48 sm:w-56 sm:h-56 relative drop-shadow-[0_12px_30px_rgba(244,63,94,0.5)] transition transform hover:scale-105" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Bọc hoa & Giấy gói nghệ thuật -->
+          <polygon points="110,210 65,120 155,120" fill="#fbcfe8" stroke="#f43f5e" stroke-width="2.5"/>
+          <polygon points="110,205 75,125 145,125" fill="#f472b6" opacity="0.65"/>
+          <!-- Ruy băng Nơ đỏ thắm -->
+          <ellipse cx="98" cy="155" rx="16" ry="8" fill="#fb7185" transform="rotate(-28 98 155)"/>
+          <ellipse cx="122" cy="155" rx="16" ry="8" fill="#fb7185" transform="rotate(28 122 155)"/>
+          <circle cx="110" cy="155" r="6" fill="#e11d48"/>
+          <path d="M110 158 Q102 185 92 198 M110 158 Q118 185 128 198" stroke="#e11d48" stroke-width="3" stroke-linecap="round"/>
+
+          <!-- Cành lá xanh mướt mát -->
+          <path d="M75 110 Q50 90 40 102 Q60 125 80 118" fill="#16a34a"/>
+          <path d="M145 110 Q170 90 180 102 Q160 125 140 118" fill="#15803d"/>
+          <path d="M110 95 Q100 65 72 72 Q90 95 106 98" fill="#22c55e"/>
+          <path d="M110 95 Q120 65 148 72 Q130 95 114 98" fill="#16a34a"/>
+
+          <!-- Đóa Hoa Hồng Nhung Đỏ (Trung tâm) -->
+          <circle cx="110" cy="92" r="25" fill="#be123c"/>
+          <circle cx="110" cy="92" r="19" fill="#e11d48"/>
+          <circle cx="110" cy="92" r="12" fill="#f43f5e"/>
+          <path d="M102 87 C102 78 118 78 118 87 C118 97 102 97 110 104" stroke="#ffe4e6" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+          <!-- Hoa Tulip Cánh Hồng Phấn (Trái) -->
+          <circle cx="76" cy="95" r="21" fill="#ec4899"/>
+          <circle cx="76" cy="95" r="15" fill="#f472b6"/>
+          <path d="M70 91 C70 85 82 85 82 91 C82 98 70 99 76 104" stroke="#fff1f2" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+          <!-- Hoa Cẩm Chướng Cam San Hô (Phải) -->
+          <circle cx="144" cy="95" r="21" fill="#f97316"/>
+          <circle cx="144" cy="95" r="15" fill="#fb923c"/>
+          <path d="M138 91 C138 85 150 85 150 91 C150 98 138 99 144 104" stroke="#fff7ed" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+          <!-- Hoa Hướng Dương & Cúc Vàng Nhỏ Đỉnh Cao -->
+          <circle cx="110" cy="50" r="18" fill="#eab308"/>
+          <circle cx="110" cy="50" r="9" fill="#a16207"/>
+          <circle cx="96" cy="50" r="4.5" fill="#fef08a"/>
+          <circle cx="124" cy="50" r="4.5" fill="#fef08a"/>
+          <circle cx="110" cy="36" r="4.5" fill="#fef08a"/>
+          <circle cx="110" cy="64" r="4.5" fill="#fef08a"/>
+
+          <!-- Hoa Oải Hương Tím Thủy Chung -->
+          <circle cx="60" cy="70" r="14" fill="#9333ea"/>
+          <circle cx="60" cy="70" r="8" fill="#c084fc"/>
+          <circle cx="160" cy="70" r="14" fill="#a855f7"/>
+          <circle cx="160" cy="70" r="8" fill="#d8b4fe"/>
+
+          <!-- Ánh đom đóm & Sao lấp lánh (Interactive Glow) -->
+          <circle cx="50" cy="45" r="3" fill="#fef08a" class="animate-ping"/>
+          <circle cx="170" cy="45" r="3" fill="#fef08a" class="animate-pulse"/>
+          <circle cx="110" cy="20" r="3.5" fill="#ffffff" class="animate-bounce"/>
+        </svg>
+
+        <!-- Thông điệp nhấp vào hoa -->
+        <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 text-[10px] tracking-wide font-semibold text-rose-300 bg-slate-900/90 px-2 py-0.5 rounded-full border border-pink-500/40">
+          Chạm vào bó hoa nhận lời chúc 💌
+        </span>
+      </div>
+
+      <!-- CHỮ 20-10 Ở DƯỚI BÓ HOA TƯƠI THẮM -->
+      <div class="mt-2 text-center">
+        <h1 class="text-6xl sm:text-7xl md:text-8xl font-black font-matrix tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-pink-400 via-rose-300 to-amber-300 drop-shadow-[0_4px_18px_rgba(244,63,94,0.7)]">
+          20 - 10
+        </h1>
+        <p class="font-art text-2xl sm:text-3xl text-pink-300 tracking-wider -mt-1 neon-text-glow">
+          Chúc Mừng Ngày Phụ Nữ Việt Nam
+        </p>
+      </div>
+
+      <!-- Vườn hoa ma thuật 30 đóa hoa nở theo câu đúng -->
+      <div class="mt-4 w-full max-w-xl glassmorphism px-4 py-3 rounded-2xl border border-pink-500/30">
+        <div class="flex items-center justify-between text-xs text-slate-300 mb-1.5 font-semibold">
+          <span class="flex items-center gap-1.5">
+            <span>🌸 Vườn hoa tri thức:</span>
+            <span id="bloomedCount" class="text-pink-400 font-bold text-sm">0</span>/30 bông nở
+          </span>
+          <span id="gardenStatus" class="text-amber-300 text-[11px]">Hãy trả lời đúng để hoa nở rộ!</span>
+        </div>
+        <!-- Vạch 30 bông hoa visual -->
+        <div id="flowerGardenBar" class="flex flex-wrap gap-1 justify-center py-1">
+          <!-- 30 biểu tượng hoa nở dần bằng JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Chọn Chế Độ Chơi (Mode Selector) -->
+    <div class="w-full max-w-4xl mx-auto px-4 mb-4 flex justify-center gap-3">
+      <button id="tabModeArcade" onclick="switchGameMode('arcade')" class="flex-1 max-w-[220px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg shadow-pink-600/30">
+        <span>⚡</span> Vượt Ải Ma Trận
+      </button>
+      <button id="tabModeExam" onclick="switchGameMode('exam')" class="flex-1 max-w-[220px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700">
+        <span>📝</span> Làm Bài Tổng Hợp
+      </button>
+    </div>
+
+    <!-- MAIN GAME AREA -->
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 pb-16">
+      
+      <!-- ==============================================
+           CHẾ ĐỘ 1: VƯỢT ẢI MA TRẬN (ARCADE TIMED MODE)
+           ============================================== -->
+      <div id="arcadeView" class="space-y-4">
+        <!-- Arcade Header HUD -->
+        <div class="glassmorphism p-4 sm:p-5 rounded-2xl border border-slate-700/70 flex items-center justify-between flex-wrap gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-pink-500/20 border border-pink-500/40 flex flex-col items-center justify-center font-bold">
+              <span class="text-[10px] text-pink-300">CÂU</span>
+              <span id="arcadeIndex" class="text-base text-white font-matrix">1/30</span>
+            </div>
+            <div>
+              <div class="text-xs text-slate-400">Điểm Ma Trận</div>
+              <div id="arcadeScore" class="text-xl font-black text-amber-300 font-matrix">0</div>
+            </div>
+          </div>
+
+          <!-- Combo Bar -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-400 font-medium">Combo:</span>
+            <div id="arcadeStreak" class="px-2.5 py-1 rounded-lg bg-pink-500/20 border border-pink-500/40 text-pink-400 font-bold text-xs">
+              x0 🔥
+            </div>
+          </div>
+
+          <!-- Đồng hồ đếm ngược -->
+          <div class="flex items-center gap-2">
+            <div class="relative w-12 h-12 flex items-center justify-center">
+              <svg class="w-12 h-12 transform -rotate-90">
+                <circle cx="24" cy="24" r="20" stroke="#334155" stroke-width="4" fill="transparent"/>
+                <circle id="timerCircle" cx="24" cy="24" r="20" stroke="#ec4899" stroke-width="4" stroke-dasharray="125.6" stroke-dashoffset="0" fill="transparent" class="transition-all duration-1000"/>
+              </svg>
+              <span id="timerText" class="absolute font-matrix text-sm font-bold text-white">20</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Thẻ câu hỏi Arcade -->
+        <div id="arcadeCard" class="glassmorphism p-6 sm:p-8 rounded-3xl border border-slate-700/80 shadow-2xl relative overflow-hidden">
+          <div class="flex items-center justify-between text-xs font-semibold text-pink-400 mb-3">
+            <span id="arcadeCategoryBadge">Chủ đề 2: Khám phá bản thân (KNTT)</span>
+            <span id="arcadeStars">⭐ 0/30</span>
+          </div>
+
+          <h2 id="arcadeQuestionText" class="text-base sm:text-lg md:text-xl font-bold text-slate-100 leading-snug mb-6 min-h-[60px]">
+            Đang nạp câu hỏi...
+          </h2>
+
+          <!-- Danh sách 4 đáp án Arcade -->
+          <div id="arcadeOptionsGrid" class="grid grid-cols-1 gap-3">
+            <!-- Render via JS -->
+          </div>
+
+          <!-- Giải thích nhanh sau khi chọn -->
+          <div id="arcadeFeedback" class="hidden mt-5 p-4 rounded-xl border text-xs sm:text-sm animate-fadeIn">
+            <div id="arcadeFeedbackTitle" class="font-bold mb-1"></div>
+            <p id="arcadeFeedbackBody" class="text-slate-300"></p>
+            <button onclick="nextArcadeQuestion()" class="mt-3 px-5 py-2 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 text-white font-bold rounded-lg text-xs transition">
+              Tiếp tục ➔
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================================
+           CHẾ ĐỘ 2: LÀM BÀI TỔNG HỢP (EXAM / REVIEW MODE)
+           ============================================== -->
+      <div id="examView" class="hidden space-y-5">
+        <!-- Exam Controller HUD -->
+        <div class="glassmorphism p-4 sm:p-5 rounded-2xl border border-slate-700/80 flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-pink-500/20 border border-pink-500/40 flex items-center justify-center text-pink-400 font-bold text-lg">
+              <span id="examAnsweredCount">0</span>/30
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-slate-200">Tiến độ bài làm</div>
+              <div class="text-xs text-slate-400" id="examStatusText">Tự do làm 30 câu & xem giải thích</div>
+            </div>
+          </div>
+
+          <!-- Bộ lọc câu hỏi -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button id="btnExamAll" onclick="setExamFilter('all')" class="px-3 py-1.5 text-xs rounded-lg font-medium bg-pink-600 text-white">Tất cả (30)</button>
+            <button id="btnExamUnanswered" onclick="setExamFilter('unanswered')" class="px-3 py-1.5 text-xs rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700">Chưa làm</button>
+            <button id="btnExamWrong" onclick="setExamFilter('wrong')" class="px-3 py-1.5 text-xs rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700 hidden">Câu sai</button>
+            <button onclick="resetExam()" class="px-3 py-1.5 text-xs rounded-lg font-medium bg-slate-800 text-slate-300 hover:text-white border border-slate-700">Làm lại</button>
+          </div>
+        </div>
+
+        <!-- Bảng điểm thi tổng hợp -->
+        <div id="examResultBanner" class="hidden glassmorphism p-6 rounded-2xl border border-emerald-500/40 bg-slate-900/90 text-center">
+          <div class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-green-300 to-yellow-300" id="examResultScore">
+            10 / 10 Điểm
+          </div>
+          <p class="text-sm text-slate-300 mt-2" id="examResultDesc">Xuất sắc! Chúc mừng bạn đã nắm vững toàn bộ chuyên đề 2!</p>
+          <div class="flex justify-center gap-3 mt-4">
+            <button onclick="setExamFilter('all'); window.scrollTo({top: 400, behavior: 'smooth'})" class="px-4 py-2 text-xs font-semibold rounded-lg bg-pink-600 text-white">Xem lại bài</button>
+            <button onclick="resetExam()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-slate-800 text-slate-200 border border-slate-700">Làm lại từ đầu</button>
+          </div>
+        </div>
+
+        <!-- Danh sách 30 câu hỏi -->
+        <div id="examQuestionsContainer" class="space-y-4">
+          <!-- Render qua JS -->
+        </div>
+
+        <!-- Nút Nộp Bài Cuối Chế Độ Thi -->
+        <div class="text-center pt-4">
+          <button id="btnSubmitExam" onclick="submitExam()" class="px-8 py-3.5 bg-gradient-to-r from-pink-500 via-rose-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold rounded-xl shadow-lg shadow-pink-500/30 transform hover:-translate-y-0.5 transition duration-200">
+            Nộp Bài & Chấm Điểm
+          </button>
+        </div>
+      </div>
+
+      <!-- MODAL THÔNG ĐIỆP YÊU THƯƠNG 20-10 -->
+      <div id="loveModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glassmorphism max-w-md w-full p-6 sm:p-8 rounded-3xl border border-pink-500/50 text-center relative shadow-2xl animate-fadeIn">
+          <button onclick="closeLoveModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center text-sm">✕</button>
+          <div class="text-5xl mb-3">💐</div>
+          <h3 class="font-art text-3xl text-pink-300 mb-2 neon-text-glow">Món Quà 20 - 10</h3>
+          <p id="loveModalText" class="text-sm text-slate-200 leading-relaxed font-medium">
+            Chúc một nửa thế giới luôn rạng rỡ như những đóa hoa hướng dương, kiên cường như hoa hồng và ngập tràn niềm vui, hạnh phúc trong cuộc sống!
+          </p>
+          <button onclick="closeLoveModal()" class="mt-6 px-6 py-2.5 bg-gradient-to-r from-pink-500 to-rose-600 text-white font-bold rounded-xl text-xs hover:from-pink-600 transition">
+            Đón Nhận Yêu Thương ✨
+          </button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Chân trang -->
+    <footer class="py-5 text-center text-xs text-slate-400 glassmorphism border-t border-slate-800 mt-auto">
+      <p class="font-semibold text-slate-300 mb-1">Chào mừng ngày Phụ nữ Việt Nam 20-10 &bull; Trí tuệ - Tự tin - Tỏa sáng</p>
+      <p>Nội dung biên soạn chuẩn hóa theo SGK Hoạt động trải nghiệm, hướng nghiệp 10 - NXB Giáo dục Việt Nam (Bộ Kết nối tri thức với cuộc sống).</p>
+    </footer>
+  </div>
+
+  <script>
+    /* ========================================================
+       1. WEB AUDIO API SYNTHESIZER (Âm thanh không cần tệp ngoài)
+       ======================================================== */
+    let audioCtx = null;
+    let isSoundOn = true;
+
+    function getAudioContext() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function toggleSound() {
+      isSoundOn = !isSoundOn;
+      document.getElementById('soundIcon').innerText = isSoundOn ? '🔊' : '🔇';
+      document.getElementById('soundLabel').innerText = isSoundOn ? 'Âm thanh: Bật' : 'Âm thanh: Tắt';
+    }
+
+    function playSound(type) {
+      if (!isSoundOn) return;
+      try {
+        const ctx = getAudioContext();
+        const now = ctx.currentTime;
+
+        if (type === 'correct') {
+          // Tiếng Ting trong trẻo (Major Chord Arpeggio)
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            gain.gain.setValueAtTime(0.15, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.35);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + i * 0.08 + 0.35);
+          });
+        } else if (type === 'wrong') {
+          // Tiếng Buzz trầm báo sai
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(140, now);
+          osc.frequency.linearRampToValueAtTime(90, now + 0.25);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'tick') {
+          // Tiếng tích tắc đồng hồ
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800, now);
+          gain.gain.setValueAtTime(0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.04);
+        } else if (type === 'win') {
+          // Fanfare chúc mừng chiến thắng
+          const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+          notes.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.12);
+            gain.gain.setValueAtTime(0.2, now + i * 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.5);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + i * 0.12);
+            osc.stop(now + i * 0.12 + 0.5);
+          });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    /* ========================================================
+       2. MA TRẬN SẮC MÀU CANVAS ENGINE (Rainbow Matrix Rain)
+       ======================================================== */
+    const matrixCanvas = document.getElementById('matrixCanvas');
+    const mCtx = matrixCanvas.getContext('2d');
+    let mWidth = (matrixCanvas.width = window.innerWidth);
+    let mHeight = (matrixCanvas.height = window.innerHeight);
+
+    const matrixChars = "20-10VIETNAMHOA🌹🌸✨010101XYZABCDEFKLMNPRSTUV★❤";
+    const fontSize = 16;
+    let matrixColumns = Math.floor(mWidth / fontSize);
+    let matrixDrops = [];
+
+    function initMatrixDrops() {
+      matrixColumns = Math.floor(mWidth / fontSize);
+      matrixDrops = [];
+      for (let i = 0; i < matrixColumns; i++) {
+        matrixDrops[i] = Math.random() * -100;
+      }
+    }
+    initMatrixDrops();
+
+    window.addEventListener('resize', () => {
+      mWidth = matrixCanvas.width = window.innerWidth;
+      mHeight = matrixCanvas.height = window.innerHeight;
+      initMatrixDrops();
+    });
+
+    const neonRainbow = [
+      '#f43f5e', '#ec4899', '#d946ef', '#a855f7', 
+      '#8b5cf6', '#3b82f6', '#06b6d4', '#10b981', 
+      '#84cc16', '#eab308', '#f97316'
+    ];
+
+    let matrixSpeedMs = 35;
+    let matrixTimer = null;
+
+    function renderMatrixFrame() {
+      mCtx.fillStyle = 'rgba(8, 12, 22, 0.09)';
+      mCtx.fillRect(0, 0, mWidth, mHeight);
+
+      for (let i = 0; i < matrixDrops.length; i++) {
+        const char = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+        const x = i * fontSize;
+        const y = matrixDrops[i] * fontSize;
+
+        const color = neonRainbow[(i + Math.floor(matrixDrops[i])) % neonRainbow.length];
+        mCtx.fillStyle = color;
+        mCtx.font = `${fontSize - 1}px monospace`;
+        mCtx.fillText(char, x, y);
+
+        if (Math.random() > 0.88) {
+          mCtx.fillStyle = '#ffffff';
+          mCtx.fillText(char, x, y);
+        }
+
+        if (y > mHeight && Math.random() > 0.975) {
+          matrixDrops[i] = 0;
+        }
+        matrixDrops[i]++;
+      }
+    }
+
+    function startMatrixLoop() {
+      if (matrixTimer) clearInterval(matrixTimer);
+      if (matrixSpeedMs > 0) {
+        matrixTimer = setInterval(renderMatrixFrame, matrixSpeedMs);
+      }
+    }
+    startMatrixLoop();
+
+    function toggleMatrixSpeed() {
+      const label = document.getElementById('matrixSpeedLabel');
+      if (matrixSpeedMs === 35) {
+        matrixSpeedMs = 15;
+        label.innerText = 'Cực nhanh ⚡';
+      } else if (matrixSpeedMs === 15) {
+        matrixSpeedMs = 70;
+        label.innerText = 'Nhẹ nhàng 🍃';
+      } else if (matrixSpeedMs === 70) {
+        matrixSpeedMs = 0;
+        clearInterval(matrixTimer);
+        mCtx.clearRect(0, 0, mWidth, mHeight);
+        label.innerText = 'Tắt ⏸';
+        return;
+      } else {
+        matrixSpeedMs = 35;
+        label.innerText = 'Bình thường';
+      }
+      startMatrixLoop();
+    }
+
+    /* ========================================================
+       3. CONFETTI PARTICLES ENGINE (Pháo hoa giấy mừng chiến thắng)
+       ======================================================== */
+    const confCanvas = document.getElementById('confettiCanvas');
+    const cCtx = confCanvas.getContext('2d');
+    let confParticles = [];
+    let confActive = false;
+
+    function resizeConfetti() {
+      confCanvas.width = window.innerWidth;
+      confCanvas.height = window.innerHeight;
+    }
+    resizeConfetti();
+    window.addEventListener('resize', resizeConfetti);
+
+    function triggerConfetti() {
+      confParticles = [];
+      confActive = true;
+      const count = 150;
+      for (let i = 0; i < count; i++) {
+        confParticles.push({
+          x: Math.random() * confCanvas.width,
+          y: Math.random() * -confCanvas.height * 0.5,
+          size: Math.random() * 8 + 4,
+          color: neonRainbow[Math.floor(Math.random() * neonRainbow.length)],
+          vx: (Math.random() - 0.5) * 4,
+          vy: Math.random() * 4 + 3,
+          rot: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 10
+        });
+      }
+      animateConfetti();
+      playSound('win');
+    }
+
+    function animateConfetti() {
+      if (!confActive) return;
+      cCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      let aliveCount = 0;
+
+      confParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.rotSpeed;
+
+        if (p.y < confCanvas.height) {
+          aliveCount++;
+        }
+
+        cCtx.save();
+        cCtx.translate(p.x, p.y);
+        cCtx.rotate((p.rot * Math.PI) / 180);
+        cCtx.fillStyle = p.color;
+        cCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        cCtx.restore();
+      });
+
+      if (aliveCount > 0) {
+        requestAnimationFrame(animateConfetti);
+      } else {
+        confActive = false;
+        cCtx.clearRect(0, 0, confCanvas.width, confCanvas.height);
+      }
+    }
+
+    /* ========================================================
+       4. NGÂN HÀNG 30 CÂU HỎI HĐTN 10 - CHỦ ĐỀ 2 (KNTT)
+       Khám phá bản thân: Tính cách, Tư duy tích cực, Quan điểm sống, Thích ứng
+       ======================================================== */
+    const quizData = [
+      {
+        id: 1,
+        question: "Theo SGK Hoạt động trải nghiệm 10 (KNTT), tư duy tích cực và cách nhìn nhận sự việc có vai trò như thế nào đối với cách giao tiếp, ứng xử?",
+        options: [
+          "Tư duy tích cực không có liên quan gì đến cách giao tiếp, ứng xử hàng ngày",
+          "Tư duy tích cực giúp nhìn nhận đa chiều, tạo nền tảng cho cách giao tiếp chan hòa, thiện chí và tôn trọng",
+          "Tư duy tích cực làm con người trở nên cả tin và dễ bị người khác lợi dụng",
+          "Tư duy tiêu cực mới là cách tốt nhất giúp bảo vệ bản thân an toàn"
+        ],
+        correct: 1,
+        explain: "Cách giao tiếp, ứng xử phụ thuộc vào cách ta tư duy và đánh giá người khác. Tư duy tích cực đem lại sự tôn trọng, bao dung và thiện chí trong mọi mối quan hệ."
+      },
+      {
+        id: 2,
+        question: "Biểu hiện nào dưới đây là biểu hiện điển hình của người có tư duy tích cực khi đối diện với thử thách?",
+        options: [
+          "Đổ lỗi ngay cho hoàn cảnh và những người xung quanh",
+          "Tìm kiếm cơ hội, điểm sáng và rút ra bài học kinh nghiệm ngay trong tình huống không như ý",
+          "Né tránh hoàn toàn và tự ti cho rằng bản thân vô dụng",
+          "Tỏ thái độ thờ ơ, buông xuôi và phó mặc cho số phận"
+        ],
+        correct: 1,
+        explain: "Người có tư duy tích cực không than vãn mà luôn chủ động tìm kiếm giải pháp và bài học tiến bộ từ nghịch cảnh."
+      },
+      {
+        id: 3,
+        question: "Hành động nào dưới đây thể hiện tư duy TIÊU CỰC khi làm việc nhóm?",
+        options: [
+          "Lắng nghe và cùng phân tích các ý kiến khác biệt với mình",
+          "Nghi ngờ động cơ của bạn bè, cho rằng mọi người đang cố tình gây khó dễ cho mình",
+          "Chủ động nhận nhiệm vụ phù hợp với năng lực",
+          "Hỗ trợ các thành viên khác khi họ gặp khó khăn"
+        ],
+        correct: 1,
+        explain: "Nghi ngờ thiếu căn cứ và quy chụp động cơ xấu của người khác là biểu hiện rõ rệt của tư duy tiêu cực, làm rạn nứt tinh thần đồng đội."
+      },
+      {
+        id: 4,
+        question: "Để điều chỉnh tư duy từ tiêu cực sang tích cực khi gặp thất bại, chúng ta NÊN thực hiện điều gì?",
+        options: [
+          "Tự trách phạt và dằn vặt bản thân trong thời gian dài",
+          "Nhìn nhận thất bại là một phần tất yếu của quá trình trưởng thành và đặt câu hỏi 'Mình học được gì từ sự việc này?'",
+          "Không bao giờ thử sức lại lĩnh vực đó nữa để tránh thất bại",
+          "Che giấu sai lầm và đổ lỗi cho người cùng tham gia"
+        ],
+        correct: 1,
+        explain: "Thừa nhận bài học từ thất bại và chuyển hóa nó thành kinh nghiệm quý giá chính là tư duy phát triển (growth mindset)."
+      },
+      {
+        id: 5,
+        question: "Quan niệm sống (quan điểm sống) của một con người được hiểu là:",
+        options: [
+          "Sở thích giải trí và thói quen sinh hoạt ngẫu nhiên hàng ngày",
+          "Hệ thống cách nhìn nhận, niềm tin định hướng về mục đích, giá trị sống và cách hành xử của cá nhân trong cuộc đời",
+          "Sự bắt chước hoàn toàn theo xu hướng ngắn hạn của mạng xã hội",
+          "Những quy định kỷ luật bắt buộc tại trường học"
+        ],
+        correct: 1,
+        explain: "Quan điểm sống là hệ thống nhận thức, niềm tin cốt lõi chỉ dẫn cách con người suy nghĩ, lựa chọn và hành động."
+      },
+      {
+        id: 6,
+        question: "Quan điểm sống đóng vai trò như thế nào trong cuộc đời mỗi học sinh?",
+        options: [
+          "Đóng vai trò như kim chỉ nam định hướng lối sống, đạo đức và các quyết định nghề nghiệp tương lai",
+          "Không có tác động gì vì cuộc sống hoàn toàn phụ thuộc vào may rủi",
+          "Làm con người trở nên rập khuôn và mất đi sự tự do",
+          "Chỉ có ý nghĩa khi bước vào độ tuổi trưởng thành đi làm"
+        ],
+        correct: 0,
+        explain: "Quan điểm sống định hình nhân cách, giúp mỗi người giữ vững bản lĩnh và mục tiêu sống giữa muôn vàn thử thách."
+      },
+      {
+        id: 7,
+        question: "Câu thành ngữ/tục ngữ nào sau đây thể hiện rõ nhất quan điểm sống kiên trì, vượt khó vươn lên?",
+        options: [
+          "Có chí thì nên",
+          "Được chăng hay chớ",
+          "Há miệng chờ sung",
+          "Gió chiều nào theo chiều ấy"
+        ],
+        correct: 0,
+        explain: "'Có chí thì nên' khẳng định sức mạnh của ý chí và nghị lực: khi có quyết tâm và kiên trì, mọi khó khăn đều có thể vượt qua."
+      },
+      {
+        id: 8,
+        question: "Quan điểm sống nào sau đây là quan điểm sống tích cực, lành mạnh và nhân văn?",
+        options: [
+          "Sống ích kỷ, chỉ cần bản thân sung sướng, người khác ra sao không quan tâm",
+          "Sống có trách nhiệm với bản thân, gia đình và cộng đồng; luôn cầu tiến và sẻ chia yêu thương",
+          "Sống hưởng thụ tối đa, không cần phải nỗ lực học tập hay lao động",
+          "Sống khép kín, tuyệt đối không tin tưởng và giúp đỡ bất kỳ ai"
+        ],
+        correct: 1,
+        explain: "Sống có trách nhiệm, không ngừng học hỏi và giàu lòng trắc ẩn là giá trị sống cốt lõi mà chương trình HĐTN 10 hướng tới."
+      },
+      {
+        id: 9,
+        question: "Câu danh ngôn 'Thất bại là mẹ thành công' khuyên chúng ta bài học gì?",
+        options: [
+          "Càng thất bại nhiều càng đáng tự hào và không cần nỗ lực thay đổi",
+          "Mỗi lần vấp ngã là một cơ hội tích lũy bài học và tôi luyện bản lĩnh để tiến tới thành công",
+          "Thất bại là điều đáng xấu hổ nên cần phải giấu kín",
+          "Thất bại chứng minh bản thân không có năng lực nên hãy từ bỏ"
+        ],
+        correct: 1,
+        explain: "Danh ngôn nhấn mạnh giá trị của sự đúc rút kinh nghiệm sau mỗi lần vấp ngã để hoàn thiện chính mình."
+      },
+      {
+        id: 10,
+        question: "Tình huống: Khi bạn thân chuyển sang trường mới và ít nhắn tin hơn trước, bạn có tư duy tích cực sẽ nghĩ gì?",
+        options: [
+          "Chắc bạn đã có bạn mới và không còn coi trọng tình bạn này nữa",
+          "Bạn đang bận làm quen với môi trường mới nhiều bỡ ngỡ, mình sẽ chủ động hỏi thăm và động viên bạn",
+          "Từ nay mình sẽ tuyệt giao và không bao giờ liên lạc lại",
+          "Đăng bài lên trang cá nhân bóng gió trách móc bạn"
+        ],
+        correct: 1,
+        explain: "Biết cảm thông cho hoàn cảnh của bạn bè và chủ động chia sẻ là biểu hiện của tư duy tích cực và tình bạn đẹp."
+      },
+      {
+        id: 11,
+        question: "Tình huống: Cha mẹ không cho phép đi chơi xa cùng nhóm bạn vì lo thời tiết xấu. Phản ứng nào thể hiện tư duy chín chắn, tích cực?",
+        options: [
+          "Hờn dỗi, đóng chặt cửa phòng và bỏ bữa ăn",
+          "Lén lút trốn nhà đi để thể hiện sự độc lập",
+          "Thấu hiểu sự lo lắng vì tình thương của cha mẹ; bình tĩnh trao đổi và vui vẻ chấp hành để đảm bảo an toàn",
+          "Tranh cãi gay gắt và cho rằng bố mẹ quá lạc hậu, độc đoán"
+        ],
+        correct: 2,
+        explain: "Hiểu được tình thương và sự an toàn là ưu tiên của cha mẹ giúp học sinh có thái độ tôn trọng và xử lý hài hòa."
+      },
+      {
+        id: 12,
+        question: "Để khám phá và nhận diện chính xác nét tính cách của bản thân, biện pháp nào sau đây là KHOA HỌC nhất?",
+        options: [
+          "Tự chiêm nghiệm qua các hoạt động hàng ngày kết hợp lắng nghe góp ý chân thành từ gia đình, thầy cô và bạn bè",
+          "Chỉ tin vào các bài bói toán vui trên mạng xã hội",
+          "Chỉ nghe theo những lời khen tâng bốc mà bỏ qua lời nhận xét thẳng thắn",
+          "Bắt chước hoàn toàn phong cách của một thần tượng trên internet"
+        ],
+        correct: 0,
+        explain: "Tự soi chiếu kết hợp với tiếp thu phản hồi đa chiều khách quan là phương pháp khoa học nhất để thấu hiểu bản thân."
+      },
+      {
+        id: 13,
+        question: "Đâu là một nét tính cách thuộc nhóm ĐIỂM MẠNH cần phát huy ở lứa tuổi học sinh lớp 10?",
+        options: [
+          "Bảo thủ, khó tiếp thu ý kiến của người khác",
+          "Chủ động, kiên trì, trung thực và có tinh thần trách nhiệm",
+          "Cả thèm chóng chán, làm việc tùy hứng",
+          "Rụt rè, luôn sợ hãi trước mọi thử thách mới"
+        ],
+        correct: 1,
+        explain: "Chủ động, trung thực, kiên trì và tinh thần trách nhiệm là những phẩm chất then chốt để thành công trong học tập và cuộc sống."
+      },
+      {
+        id: 14,
+        question: "Khi nhận thấy bản thân có điểm yếu là 'thường xuyên trì hoãn bài vở', giải pháp nào là HIỆU QUẢ nhất?",
+        options: [
+          "Chờ đợi đến sát hạn nộp bài mới cuống cuồng làm",
+          "Lập thời gian biểu cụ thể, chia nhỏ mục tiêu và rèn luyện kỷ luật bản thân mỗi ngày",
+          "Đổ lỗi cho chương trình học quá nặng nên không thể hoàn thành",
+          "Từ bỏ không làm những bài tập mình cảm thấy khó"
+        ],
+        correct: 1,
+        explain: "Phương pháp chia nhỏ mục tiêu và lập kế hoạch rõ ràng giúp giảm áp lực tâm lý và khắc phục triệt để thói quen trì hoãn."
+      },
+      {
+        id: 15,
+        question: "Hành động nào sau đây KHÔNG giúp nuôi dưỡng tư duy tích cực?",
+        options: [
+          "Tập trung tìm kiếm giải pháp thay vì mãi than vãn vấn đề",
+          "Giao lưu và kết bạn với những người có nguồn năng lượng lạc quan",
+          "Dành thời gian ghi chép những điều mình biết ơn mỗi ngày",
+          "Thường xuyên tham gia bình luận tiêu cực, soi mói lỗi lầm người khác trên mạng"
+        ],
+        correct: 3,
+        explain: "Tham gia vào các cuộc tranh luận tiêu cực, chỉ trích độc hại trên mạng sẽ làm cạn kiệt năng lượng và nuôi dưỡng cảm xúc bi quan."
+      },
+      {
+        id: 16,
+        question: "Tình huống: Khi bị điểm kém trong một bài kiểm tra định kỳ, người có tư duy tích cực sẽ:",
+        options: [
+          "Tự nhủ rằng mình không có khả năng và bỏ cuộc hoàn toàn",
+          "Xem đây là tín hiệu chỉ ra phần kiến thức còn hổng để tập trung ôn tập và cải thiện ở bài sau",
+          "Cho rằng thầy cô cố tình chấm điểm khắt khe với mình",
+          "Xé bài kiểm tra và giấu không cho gia đình biết"
+        ],
+        correct: 1,
+        explain: "Tư duy tích cực xem điểm số chưa tốt là cơ hội phản chiếu để học hỏi và bồi đắp kiến thức còn thiếu."
+      },
+      {
+        id: 17,
+        question: "Trong thảo luận nhóm, khi có bạn đưa ra ý kiến trái ngược hoàn toàn với mình, cách ứng xử văn minh là:",
+        options: [
+          "Cắt lời bạn ngay lập tức và khẳng định mình mới đúng",
+          "Lắng nghe trọn vẹn, tìm điểm hợp lý trong luận điểm của bạn và cùng trao đổi ôn hòa trên tinh thần tôn trọng",
+          "Bực bội rời khỏi nhóm và không chịu hợp tác tiếp",
+          "Chỉ trích cá nhân bạn trước cả lớp"
+        ],
+        correct: 1,
+        explain: "Tôn trọng sự khác biệt và lắng nghe thiện chí là cốt lõi của giao tiếp văn minh và kỹ năng hợp tác nhóm."
+      },
+      {
+        id: 18,
+        question: "Theo bài học HĐTN 10, một kế hoạch rèn luyện bản thân hiệu quả CẦN đảm bảo tiêu chí nào?",
+        options: [
+          "Mục tiêu càng mơ hồ và chung chung càng tốt",
+          "Mục tiêu rõ ràng, khả thi, có biện pháp cụ thể, thời hạn rõ ràng và tự đánh giá định kỳ",
+          "Chỉ cần viết ra cho có để nộp giáo viên chứ không cần thực hiện",
+          "Đặt ra những mục tiêu quá cao siêu vượt xa năng lực thực tế"
+        ],
+        correct: 1,
+        explain: "Kế hoạch rèn luyện chuẩn SMART (cụ thể, đo lường được, khả thi, thực tế và có thời hạn) mới mang lại kết quả thực chất."
+      },
+      {
+        id: 19,
+        question: "Điều gì sẽ xảy ra nếu một học sinh không xây dựng cho mình quan điểm sống đúng đắn?",
+        options: [
+          "Sẽ luôn thành công dễ dàng vì không bị ràng buộc bởi nguyên tắc",
+          "Dễ bị dao động, a dua theo bạn xấu, thiếu bản lĩnh và mất phương hướng trước cám dỗ",
+          "Được tất cả mọi người yêu mến tuyệt đối",
+          "Không bao giờ gặp phải khó khăn hay sai lầm"
+        ],
+        correct: 1,
+        explain: "Thiếu quan điểm sống vững vàng khiến cá nhân như con thuyền không bánh lái, dễ bị lôi kéo và vấp ngã trước cám dỗ."
+      },
+      {
+        id: 20,
+        question: "Hình ảnh người phụ nữ Việt Nam trong ca dao: 'Thân em như chẽn lúa đòng đòng / Phất phơ dưới ngọn nắng hồng ban mai' gợi lên vẻ đẹp nào?",
+        options: [
+          "Vẻ đẹp trẻ trung, tươi tắn, căng tràn sức sống và duyên dáng",
+          "Sự yếu đuối, bất lực trước thiên nhiên khắc nghiệt",
+          "Tính cách kiêu kỳ, xa cách với lao động",
+          "Sự cam chịu số phận bất hạnh"
+        ],
+        correct: 0,
+        explain: "Hình ảnh lúa đòng đòng ngậm sữa tắm mình trong nắng sớm tượng trưng cho vẻ đẹp tinh khôi, khỏe khoắn và rạng ngời của người thiếu nữ."
+      },
+      {
+        id: 21,
+        question: "Hành động nào trong dịp 20-10 thể hiện sâu sắc nhất lòng biết ơn và phẩm chất hiếu thảo của học sinh đối với bà, mẹ và cô giáo?",
+        options: [
+          "Đòi hỏi cha mẹ mua cho món đồ đắt tiền để ăn mừng",
+          "Gửi lời chúc chân thành, làm tấm thiệp ý nghĩa hoặc bông hoa tươi, phụ giúp việc nhà và chăm ngoan trong học tập",
+          "Chỉ chia sẻ các bài viết hình thức trên mạng mà ở nhà vẫn lười biếng, cãi lời",
+          "Không quan tâm vì cho rằng ngày này chỉ dành cho người lớn"
+        ],
+        correct: 1,
+        explain: "Lòng biết ơn chân thực được biểu hiện qua lời nói chân thành, hành động hiếu kính hàng ngày và sự cố gắng vươn lên."
+      },
+      {
+        id: 22,
+        question: "Nhận định: 'Mỗi cá nhân là một phiên bản độc bản, đều có giá trị riêng và xứng đáng được tôn trọng'. Đây là biểu hiện của:",
+        options: [
+          "Quan điểm sống nhân văn, tôn trọng nhân phẩm và sự bình đẳng của con người",
+          "Sự ảo tưởng và ngây thơ về cuộc sống",
+          "Thái độ tự cao tự đại, coi thường người khác",
+          "Biểu hiện của sự thiếu ý chí phấn đấu"
+        ],
+        correct: 0,
+        explain: "Tôn trọng tính độc bản của mỗi người là tiền đề của tình yêu thương, sự khoan dung và xã hội văn minh."
+      },
+      {
+        id: 23,
+        question: "Khi phải nói trước đám đông hoặc thuyết trình mà cảm thấy hồi hộp, lo âu, cách ứng phó tích cực là:",
+        options: [
+          "Từ bỏ và xin giáo viên không tham gia nữa",
+          "Hít thở sâu, mỉm cười tự nhủ 'Mình đã chuẩn bị chu đáo, đây là cơ hội quý để rèn luyện sự tự tin'",
+          "Tự nguyền rủa bản thân kém cỏi",
+          "Đổ lỗi cho các bạn nhóm đã đùn đẩy trách nhiệm cho mình"
+        ],
+        correct: 1,
+        explain: "Kỹ thuật hít thở sâu kết hợp ám thị tích cực (positive affirmations) giúp ổn định nhịp tim và củng cố sự tự tin sân khấu."
+      },
+      {
+        id: 24,
+        question: "Nét tính cách nào sau đây là nền tảng để xây dựng uy tín cá nhân trong tập thể?",
+        options: [
+          "Nói một đằng làm một nẻo",
+          "Trung thực, đúng giờ và luôn có trách nhiệm với lời hứa của mình",
+          "Luôn trốn tránh nhiệm vụ khó",
+          "Chỉ làm việc tốt khi có người khác khen ngợi"
+        ],
+        correct: 1,
+        explain: "Sự trung thực, đúng hẹn và tôn trọng lời hứa là những yếu tố cốt lõi tạo nên chữ 'Tín' của mỗi con người."
+      },
+      {
+        id: 25,
+        question: "Trong quan hệ bạn bè cùng lớp, tư duy tích cực mang lại lợi ích gì?",
+        options: [
+          "Biết nhìn vào ưu điểm của bạn để học hỏi, bao dung với lỗi nhỏ và cùng động viên nhau tiến bộ",
+          "Luôn soi mói lỗi lầm để làm bạn mất mặt trước đám đông",
+          "Ỷ lại hoàn toàn vào bạn mà không tự giác học tập",
+          "Cạnh tranh đố kị và không muốn bạn giỏi hơn mình"
+        ],
+        correct: 0,
+        explain: "Tư duy tích cực nuôi dưỡng sự đồng cảm, trân trọng thế mạnh của bạn bè và cùng nhau xây dựng tình bạn gắn kết."
+      },
+      {
+        id: 26,
+        question: "Tại sao khám phá bản thân lại là bước đi đầu tiên và quan trọng nhất trong việc định hướng nghề nghiệp tương lai?",
+        options: [
+          "Vì hiểu rõ năng khiếu, sở thích, tính cách và giá trị của bản thân giúp ta chọn được ngành nghề phù hợp và phát huy tối đa năng lực",
+          "Vì giúp kiếm được nhiều tiền ngay lập tức mà không cần phấn đấu",
+          "Vì đây chỉ là thủ tục theo yêu cầu của nhà trường",
+          "Vì nghề nghiệp sau này hoàn toàn do may rủi quyết định"
+        ],
+        correct: 0,
+        explain: "Hiểu mình để chọn nghề là nguyên lý cốt lõi trong hướng nghiệp; sự phù hợp giữa tính cách và công việc sẽ đem lại hạnh phúc và thành công bền vững."
+      },
+      {
+        id: 27,
+        question: "Biểu hiện nào dưới đây chứng minh một người có tính cách 'Tự chủ và độc lập'?",
+        options: [
+          "Luôn chống đối và từ chối mọi lời khuyên chân thành của thầy cô và cha mẹ",
+          "Tự giác trong học tập, sinh hoạt; dám đưa ra quyết định đúng đắn và chịu trách nhiệm với lựa chọn của mình",
+          "Cô lập bản thân, không giao tiếp với bất kỳ ai trong lớp",
+          "Chỉ bắt tay làm việc khi có sự giám sát, đôn đốc của người lớn"
+        ],
+        correct: 1,
+        explain: "Tính tự chủ là khả năng tự định hướng, tự quản trị bản thân và có dũng khí chịu trách nhiệm với hành động của chính mình."
+      },
+      {
+        id: 28,
+        question: "Tình huống: Hoàng rất có đam mê và năng khiếu về công nghệ thông tin nhưng một số người lại khuyên nên chọn ngành khác đang hot. Hoàng nên làm gì?",
+        options: [
+          "Bỏ ngay đam mê của mình để chạy theo ngành nghề theo phong trào dù không thích",
+          "Lắng nghe có chọn lọc các lời khuyên, chủ động tìm hiểu sâu về thị trường ngành CNTT và kiên trì rèn luyện năng lực để chứng minh năng lực bản thân",
+          "Tranh cãi gay gắt và xem thường ý kiến của mọi người",
+          "Buông xuôi không thèm học môn nào nữa"
+        ],
+        correct: 1,
+        explain: "Tìm hiểu thực tế, kiên định với năng lực và đam mê chân chính là thái độ đúng đắn khi định hướng nghề nghiệp tương lai."
+      },
+      {
+        id: 29,
+        question: "Tính kiên trì, bền bỉ (Grit) có ý nghĩa như thế nào đối với sự phát triển nhân cách của học sinh?",
+        options: [
+          "Giúp con người không nản chí trước chướng ngại vật, vượt qua giới hạn của bản thân để chinh phục ước mơ",
+          "Làm con người trở nên bướng bỉnh và không chịu học hỏi cái mới",
+          "Không có tác dụng gì vì sự may mắn mới là nhân tố quyết định",
+          "Chỉ tốn thời gian vô ích"
+        ],
+        correct: 0,
+        explain: "Nghị lực và tính kiên trì bền bỉ được khoa học chứng minh là yếu tố dự báo thành công chính xác hơn cả chỉ số thông minh đơn thuần."
+      },
+      {
+        id: 30,
+        question: "Thông điệp bao trùm của Chủ đề 2 'Khám phá bản thân' trong sách Hoạt động trải nghiệm 10 (KNTT) là gì?",
+        options: [
+          "Chờ đợi sự sắp đặt hoàn toàn của số phận mà không cần nỗ lực",
+          "Hãy dũng cảm thấu hiểu chính mình, nuôi dưỡng tư duy tích cực, rèn luyện tính cách tốt đẹp và kiên định xây dựng quan điểm sống nhân văn",
+          "Chỉ chú trọng điểm số thi cử, không cần bồi đắp phẩm chất đạo đức",
+          "Tính cách là bẩm sinh cố định, không thể rèn luyện hay thay đổi được"
+        ],
+        correct: 1,
+        explain: "Chủ đề 2 truyền cảm hứng giúp học sinh hiểu mình để hoàn thiện mình, sống tích cực, có trách nhiệm và tự tin tỏa sáng."
+      }
+    ];
+
+    // Mảng 10 lời chúc / thông điệp yêu thương 20-10 ngẫu nhiên
+    const loveMessages = [
+      "💐 Chúc một nửa thế giới luôn tươi tắn như những đóa hoa ban mai, kiên cường như hoa hồng và ngập tràn hạnh phúc!",
+      "🌸 Tri thức mở ra chân trời, sự tự tin tô điểm cho nụ cười. Chúc bạn một ngày 20-10 thật rực rỡ và đong đầy yêu thương!",
+      "🌷 Chúc các bà, các mẹ, các cô giáo và các bạn nữ luôn ngập tràn niềm vui, mạnh mẽ bước đi trên con đường mình đã chọn!",
+      "✨ Vẻ đẹp của người phụ nữ bắt đầu từ tâm hồn nhân ái, tư duy tích cực và sự tự chủ. Chúc mừng ngày Phụ nữ Việt Nam 20-10!",
+      "🌺 Mỗi người là một đóa hoa độc bản ngát hương thơm. Hãy luôn tự tin tỏa sáng vẻ đẹp và trí tuệ của chính mình!",
+      "💖 Chúc bạn luôn có đủ dũng khí để ước mơ, đủ kiên trì để chinh phục và luôn được yêu thương trọn vẹn mỗi ngày!"
+    ];
+
+    /* ========================================================
+       5. QUẢN LÝ VƯỜN HOA MA THUẬT & TRẠNG THÁI CHUNG
+       ======================================================== */
+    let totalCorrectAnswers = 0;
+    const answeredCorrectSet = new Set();
+
+    function initFlowerGardenBar() {
+      const container = document.getElementById('flowerGardenBar');
+      container.innerHTML = '';
+      for (let i = 1; i <= 30; i++) {
+        const flowerSpan = document.createElement('span');
+        flowerSpan.id = `flower_icon_${i}`;
+        flowerSpan.className = 'text-sm opacity-25 filter grayscale transition duration-500 transform hover:scale-125 inline-block';
+        flowerSpan.innerText = ['🌸', '🌺', '🌹', '🌷', '🌻', '🌼'][(i - 1) % 6];
+        flowerSpan.title = `Hoa số ${i}: Trả lời đúng câu ${i} để nở!`;
+        container.appendChild(flowerSpan);
+      }
+    }
+    initFlowerGardenBar();
+
+    function updateGardenVisual(questionId, isCorrect) {
+      if (isCorrect) {
+        answeredCorrectSet.add(questionId);
+      } else {
+        answeredCorrectSet.delete(questionId);
+      }
+      const count = answeredCorrectSet.size;
+      document.getElementById('bloomedCount').innerText = count;
+
+      for (let i = 1; i <= 30; i++) {
+        const el = document.getElementById(`flower_icon_${i}`);
+        if (el) {
+          if (answeredCorrectSet.has(i)) {
+            el.className = 'text-sm opacity-100 filter-none transition duration-500 transform scale-110 animate-bounce inline-block';
+          } else {
+            el.className = 'text-sm opacity-25 filter grayscale transition duration-500 inline-block';
+          }
+        }
+      }
+
+      const statusEl = document.getElementById('gardenStatus');
+      if (count === 30) {
+        statusEl.innerText = "🌟 Tuyệt vời! Vườn hoa 30 đóa đã nở rộ toàn phần!";
+        statusEl.className = "text-emerald-400 font-bold text-[11px] animate-pulse";
+      } else if (count >= 20) {
+        statusEl.innerText = `🌸 Đã nở ${count}/30 bông hoa rực rỡ!`;
+      } else {
+        statusEl.innerText = "Hãy tiếp tục trả lời đúng để hoa nở rộ!";
+      }
+    }
+
+    function showLoveMessage() {
+      const randomMsg = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+      document.getElementById('loveModalText').innerText = randomMsg;
+      document.getElementById('loveModal').classList.remove('hidden');
+      playSound('correct');
+    }
+
+    function closeLoveModal() {
+      document.getElementById('loveModal').classList.add('hidden');
+    }
+
+    /* ========================================================
+       6. CHẾ ĐỘ 1: VƯỢT ẢI MA TRẬN (ARCADE TIMED MODE)
+       ======================================================== */
+    let arcadeCurrentIdx = 0;
+    let arcadeScore = 0;
+    let arcadeStreak = 0;
+    let arcadeTimer = null;
+    let arcadeTimeLeft = 20;
+    let arcadeAnswered = false;
+
+    function startArcadeTimer() {
+      clearInterval(arcadeTimer);
+      arcadeTimeLeft = 20;
+      updateTimerVisual();
+
+      arcadeTimer = setInterval(() => {
+        arcadeTimeLeft--;
+        updateTimerVisual();
+        if (arcadeTimeLeft <= 5 && arcadeTimeLeft > 0) {
+          playSound('tick');
+        }
+        if (arcadeTimeLeft <= 0) {
+          clearInterval(arcadeTimer);
+          handleArcadeTimeOut();
+        }
+      }, 1000);
+    }
+
+    function updateTimerVisual() {
+      const timerText = document.getElementById('timerText');
+      const timerCircle = document.getElementById('timerCircle');
+      timerText.innerText = arcadeTimeLeft;
+
+      // Chu vi bán kính 20: 2 * PI * 20 ≈ 125.6
+      const offset = 125.6 - (arcadeTimeLeft / 20) * 125.6;
+      timerCircle.style.strokeDashoffset = offset;
+
+      if (arcadeTimeLeft <= 5) {
+        timerCircle.style.stroke = '#ef4444';
+        timerText.style.color = '#ef4444';
+      } else {
+        timerCircle.style.stroke = '#ec4899';
+        timerText.style.color = '#ffffff';
+      }
+    }
+
+    function renderArcadeQuestion() {
+      arcadeAnswered = false;
+      const q = quizData[arcadeCurrentIdx];
+
+      document.getElementById('arcadeIndex').innerText = `${q.id}/30`;
+      document.getElementById('arcadeQuestionText').innerText = `${q.id}. ${q.question}`;
+      document.getElementById('arcadeFeedback').classList.add('hidden');
+
+      const container = document.getElementById('arcadeOptionsGrid');
+      container.innerHTML = '';
+
+      const labels = ['A', 'B', 'C', 'D'];
+      q.options.forEach((optText, optIdx) => {
+        const btn = document.createElement('button');
+        btn.id = `arcadeOpt_${optIdx}`;
+        btn.onclick = () => selectArcadeAnswer(optIdx);
+        btn.className = "w-full text-left p-3.5 sm:p-4 rounded-xl border border-slate-700/80 bg-slate-900/60 hover:bg-slate-800/80 hover:border-pink-500/50 text-slate-200 transition flex items-start gap-3 text-xs sm:text-sm";
+        btn.innerHTML = `
+          <span class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-600 flex items-center justify-center font-bold text-pink-300 flex-shrink-0">
+            ${labels[optIdx]}
+          </span>
+          <span class="pt-1 flex-grow">${optText}</span>
+        `;
+        container.appendChild(btn);
+      });
+
+      startArcadeTimer();
+    }
+
+    function selectArcadeAnswer(selectedIdx) {
+      if (arcadeAnswered) return;
+      arcadeAnswered = true;
+      clearInterval(arcadeTimer);
+
+      const q = quizData[arcadeCurrentIdx];
+      const isCorrect = selectedIdx === q.correct;
+      const selectedBtn = document.getElementById(`arcadeOpt_${selectedIdx}`);
+      const correctBtn = document.getElementById(`arcadeOpt_${q.correct}`);
+
+      // Vô hiệu hóa nút
+      for (let i = 0; i < 4; i++) {
+        const b = document.getElementById(`arcadeOpt_${i}`);
+        if (b) b.disabled = true;
+      }
+
+      if (isCorrect) {
+        playSound('correct');
+        arcadeStreak++;
+        const points = 100 + arcadeTimeLeft * 10 + (arcadeStreak > 1 ? (arcadeStreak - 1) * 20 : 0);
+        arcadeScore += points;
+        document.getElementById('arcadeScore').innerText = arcadeScore;
+        document.getElementById('arcadeStreak').innerText = `x${arcadeStreak} 🔥`;
+        document.getElementById('arcadeStreak').className = "px-2.5 py-1 rounded-lg bg-pink-500/20 border border-pink-500/40 text-pink-400 font-bold text-xs scale-pulse";
+
+        selectedBtn.className = "w-full text-left p-3.5 sm:p-4 rounded-xl border border-emerald-500 bg-emerald-950/60 text-emerald-200 transition flex items-start gap-3 text-xs sm:text-sm ring-2 ring-emerald-500/50";
+        updateGardenVisual(q.id, true);
+        showArcadeFeedback(true, q.explain);
+      } else {
+        playSound('wrong');
+        arcadeStreak = 0;
+        document.getElementById('arcadeStreak').innerText = `x0 🔥`;
+        document.getElementById('arcadeStreak').className = "px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 font-bold text-xs";
+
+        selectedBtn.className = "w-full text-left p-3.5 sm:p-4 rounded-xl border border-rose-500 bg-rose-950/60 text-rose-200 transition flex items-start gap-3 text-xs sm:text-sm line-through";
+        if (correctBtn) {
+          correctBtn.className = "w-full text-left p-3.5 sm:p-4 rounded-xl border border-emerald-500 bg-emerald-950/60 text-emerald-200 transition flex items-start gap-3 text-xs sm:text-sm";
+        }
+        updateGardenVisual(q.id, false);
+        showArcadeFeedback(false, q.explain);
+      }
+
+      document.getElementById('arcadeStars').innerText = `⭐ ${answeredCorrectSet.size}/30`;
+    }
+
+    function handleArcadeTimeOut() {
+      if (arcadeAnswered) return;
+      arcadeAnswered = true;
+      playSound('wrong');
+      arcadeStreak = 0;
+      document.getElementById('arcadeStreak').innerText = `x0 🔥`;
+
+      const q = quizData[arcadeCurrentIdx];
+      const correctBtn = document.getElementById(`arcadeOpt_${q.correct}`);
+      if (correctBtn) {
+        correctBtn.className = "w-full text-left p-3.5 sm:p-4 rounded-xl border border-emerald-500 bg-emerald-950/60 text-emerald-200 transition flex items-start gap-3 text-xs sm:text-sm";
+      }
+      for (let i = 0; i < 4; i++) {
+        const b = document.getElementById(`arcadeOpt_${i}`);
+        if (b) b.disabled = true;
+      }
+      showArcadeFeedback(false, `Đã hết thời gian 20 giây! ${q.explain}`);
+    }
+
+    function showArcadeFeedback(isCorrect, explainText) {
+      const fbBox = document.getElementById('arcadeFeedback');
+      const fbTitle = document.getElementById('arcadeFeedbackTitle');
+      const fbBody = document.getElementById('arcadeFeedbackBody');
+
+      fbBox.classList.remove('hidden');
+      if (isCorrect) {
+        fbBox.className = "mt-5 p-4 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-xs sm:text-sm";
+        fbTitle.innerHTML = "<span class='text-emerald-400'>✓ CHÍNH XÁC! Tuyệt vời!</span>";
+      } else {
+        fbBox.className = "mt-5 p-4 rounded-xl border border-rose-500/50 bg-rose-950/40 text-xs sm:text-sm";
+        fbTitle.innerHTML = "<span class='text-rose-400'>✗ CHƯA ĐÚNG!</span>";
+      }
+      fbBody.innerText = explainText;
+    }
+
+    function nextArcadeQuestion() {
+      if (arcadeCurrentIdx < quizData.length - 1) {
+        arcadeCurrentIdx++;
+        renderArcadeQuestion();
+      } else {
+        // Đã hoàn thành 30 câu Arcade
+        finishArcadeGame();
+      }
+    }
+
+    function finishArcadeGame() {
+      clearInterval(arcadeTimer);
+      triggerConfetti();
+      const stars = answeredCorrectSet.size;
+      const card = document.getElementById('arcadeCard');
+      card.innerHTML = `
+        <div class="text-center py-8">
+          <div class="text-6xl mb-3">💐🎉</div>
+          <h2 class="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-300 to-amber-300 font-matrix">
+            HOÀN THÀNH VƯỢT ẢI MA TRẬN!
+          </h2>
+          <p class="text-slate-300 mt-2 text-sm">Điểm số tổng kết: <span class="text-amber-400 font-bold text-lg font-matrix">${arcadeScore}</span> điểm</p>
+          <p class="text-pink-300 mt-1 text-sm font-semibold">Đã thắp sáng ${stars}/30 bông hoa tri thức rực rỡ</p>
+          <div class="mt-6 flex justify-center gap-4">
+            <button onclick="restartArcade()" class="px-6 py-2.5 bg-gradient-to-r from-pink-600 to-rose-600 text-white font-bold rounded-xl text-xs hover:from-pink-500 transition">
+              Chơi lại từ đầu ↻
+            </button>
+            <button onclick="switchGameMode('exam')" class="px-6 py-2.5 bg-slate-800 text-slate-200 border border-slate-700 font-bold rounded-xl text-xs hover:bg-slate-700 transition">
+              Xem lại 30 câu & giải thích
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function restartArcade() {
+      arcadeCurrentIdx = 0;
+      arcadeScore = 0;
+      arcadeStreak = 0;
+      document.getElementById('arcadeScore').innerText = '0';
+      document.getElementById('arcadeStreak').innerText = 'x0 🔥';
+      document.getElementById('arcadeCard').innerHTML = `
+        <div class="flex items-center justify-between text-xs font-semibold text-pink-400 mb-3">
+          <span id="arcadeCategoryBadge">Chủ đề 2: Khám phá bản thân (KNTT)</span>
+          <span id="arcadeStars">⭐ 0/30</span>
+        </div>
+        <h2 id="arcadeQuestionText" class="text-base sm:text-lg md:text-xl font-bold text-slate-100 leading-snug mb-6 min-h-[60px]">Đang nạp câu hỏi...</h2>
+        <div id="arcadeOptionsGrid" class="grid grid-cols-1 gap-3"></div>
+        <div id="arcadeFeedback" class="hidden mt-5 p-4 rounded-xl border text-xs sm:text-sm animate-fadeIn">
+          <div id="arcadeFeedbackTitle" class="font-bold mb-1"></div>
+          <p id="arcadeFeedbackBody" class="text-slate-300"></p>
+          <button onclick="nextArcadeQuestion()" class="mt-3 px-5 py-2 bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 text-white font-bold rounded-lg text-xs transition">
+            Tiếp tục ➔
+          </button>
+        </div>
+      `;
+      renderArcadeQuestion();
+    }
+
+    /* ========================================================
+       7. CHẾ ĐỘ 2: LÀM BÀI TỔNG HỢP (EXAM / REVIEW MODE)
+       ======================================================== */
+    let examUserAnswers = {};
+    let isExamSubmitted = false;
+    let examFilter = 'all';
+
+    function renderExamQuiz() {
+      const container = document.getElementById('examQuestionsContainer');
+      container.innerHTML = '';
+
+      let list = quizData.filter(q => {
+        if (examFilter === 'unanswered') {
+          return examUserAnswers[q.id] === undefined;
+        }
+        if (examFilter === 'wrong') {
+          return isExamSubmitted && examUserAnswers[q.id] !== q.correct;
+        }
+        return true;
+      });
+
+      if (list.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-10 glassmorphism rounded-2xl border border-slate-800">
+            <span class="text-3xl">✨</span>
+            <p class="text-slate-300 mt-2 text-xs sm:text-sm font-medium">Không có câu hỏi nào trong danh mục lọc này!</p>
+          </div>
+        `;
+        return;
+      }
+
+      const labels = ['A', 'B', 'C', 'D'];
+
+      list.forEach(q => {
+        const card = document.createElement('div');
+        const isAnswered = examUserAnswers[q.id] !== undefined;
+        const isCorrect = isExamSubmitted && examUserAnswers[q.id] === q.correct;
+
+        card.className = `glassmorphism p-5 sm:p-6 rounded-2xl border transition duration-200 ${
+          isExamSubmitted
+            ? (isCorrect ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-rose-500/50 bg-rose-950/10')
+            : 'border-slate-800 hover:border-pink-500/30'
+        }`;
+
+        let html = `
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <div class="flex items-center gap-2.5">
+              <span class="w-7 h-7 rounded-lg bg-pink-500/20 text-pink-400 border border-pink-500/40 font-bold text-xs flex items-center justify-center flex-shrink-0">
+                ${q.id}
+              </span>
+              <h3 class="text-xs sm:text-sm font-semibold text-slate-100 leading-relaxed">
+                ${q.question}
+              </h3>
+            </div>
+            ${isExamSubmitted ? `
+              <span class="px-2 py-0.5 text-[11px] font-bold rounded ${
+                isCorrect ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+              }">
+                ${isCorrect ? '✓ Đúng' : '✗ Sai'}
+              </span>
+            ` : ''}
+          </div>
+          <div class="grid grid-cols-1 gap-2">
+        `;
+
+        q.options.forEach((optText, optIdx) => {
+          const isSelected = examUserAnswers[q.id] === optIdx;
+          let styleClass = "bg-slate-900/60 border-slate-700/60 text-slate-200 hover:bg-slate-800 hover:border-pink-500/40";
+
+          if (isSelected && !isExamSubmitted) {
+            styleClass = "bg-pink-600/30 border-pink-500 text-white font-medium";
+          } else if (isExamSubmitted) {
+            if (optIdx === q.correct) {
+              styleClass = "bg-emerald-600/30 border-emerald-500 text-emerald-200 font-semibold ring-1 ring-emerald-400";
+            } else if (isSelected && optIdx !== q.correct) {
+              styleClass = "bg-rose-600/30 border-rose-500 text-rose-200 line-through";
+            }
+          }
+
+          html += `
+            <button 
+              type="button" 
+              onclick="selectExamAnswer(${q.id}, ${optIdx})"
+              ${isExamSubmitted ? 'disabled' : ''}
+              class="w-full text-left p-2.5 sm:p-3 rounded-xl border text-xs sm:text-sm transition flex items-start gap-2.5 ${styleClass}">
+              <span class="w-5 h-5 rounded flex items-center justify-center font-bold text-[11px] bg-slate-800 border border-slate-600 text-pink-300 flex-shrink-0">
+                ${labels[optIdx]}
+              </span>
+              <span class="pt-0.5 flex-grow">${optText}</span>
+            </button>
+          `;
+        });
+
+        html += `</div>`;
+
+        if (isExamSubmitted) {
+          html += `
+            <div class="mt-3 p-3 rounded-xl bg-slate-900/90 border border-slate-700/70 text-xs text-slate-300 leading-relaxed">
+              <span class="text-amber-300 font-bold">💡 Giải thích SGK:</span> ${q.explain}
+            </div>
+          `;
+        }
+
+        card.innerHTML = html;
+        container.appendChild(card);
+      });
+
+      updateExamProgressHUD();
+    }
+
+    function selectExamAnswer(questionId, optIdx) {
+      if (isExamSubmitted) return;
+      examUserAnswers[questionId] = optIdx;
+      playSound('tick');
+      renderExamQuiz();
+    }
+
+    function updateExamProgressHUD() {
+      const count = Object.keys(examUserAnswers).length;
+      document.getElementById('examAnsweredCount').innerText = count;
+      if (!isExamSubmitted) {
+        document.getElementById('examStatusText').innerText = count === 30 ? "Đã làm xong tất cả 30 câu! Hãy nộp bài." : `Đã hoàn thành ${count}/30 câu`;
+      }
+    }
+
+    function setExamFilter(type) {
+      examFilter = type;
+      document.getElementById('btnExamAll').className = type === 'all' 
+        ? "px-3 py-1.5 text-xs rounded-lg font-medium bg-pink-600 text-white" 
+        : "px-3 py-1.5 text-xs rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700";
+
+      document.getElementById('btnExamUnanswered').className = type === 'unanswered' 
+        ? "px-3 py-1.5 text-xs rounded-lg font-medium bg-pink-600 text-white" 
+        : "px-3 py-1.5 text-xs rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700";
+
+      const btnWrong = document.getElementById('btnExamWrong');
+      if (btnWrong) {
+        btnWrong.className = type === 'wrong'
+          ? "px-3 py-1.5 text-xs rounded-lg font-medium bg-pink-600 text-white"
+          : "px-3 py-1.5 text-xs rounded-lg font-medium bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700";
+      }
+
+      renderExamQuiz();
+    }
+
+    function submitExam() {
+      if (isExamSubmitted) return;
+      const count = Object.keys(examUserAnswers).length;
+      if (count < 30) {
+        const accept = window.confirm(`Bạn mới làm ${count}/30 câu. Bạn có muốn nộp bài và chấm điểm ngay bây giờ không?`);
+        if (!accept) return;
+      }
+
+      isExamSubmitted = true;
+      let corrects = 0;
+      quizData.forEach(q => {
+        const isRight = examUserAnswers[q.id] === q.correct;
+        if (isRight) corrects++;
+        updateGardenVisual(q.id, isRight);
+      });
+
+      const score = ((corrects / 30) * 10).toFixed(1);
+
+      document.getElementById('examResultBanner').classList.remove('hidden');
+      document.getElementById('btnExamWrong').classList.remove('hidden');
+      document.getElementById('btnSubmitExam').classList.add('hidden');
+
+      document.getElementById('examResultScore').innerHTML = `${score} / 10 Điểm <br><span class="text-xs text-pink-300 font-semibold">(Đúng ${corrects}/30 câu)</span>`;
+
+      if (corrects >= 27) {
+        document.getElementById('examResultDesc').innerText = "🌟 Quá xuất sắc! Bạn nắm rất vững kiến thức Khám phá bản thân và tư duy sống tích cực!";
+        triggerConfetti();
+      } else if (corrects >= 21) {
+        document.getElementById('examResultDesc').innerText = "👏 Rất tốt! Bạn hiểu sâu sắc các quan điểm sống và kỹ năng thích ứng mới.";
+        playSound('correct');
+      } else if (corrects >= 15) {
+        document.getElementById('examResultDesc').innerText = "👍 Đạt yêu cầu. Hãy đọc thêm giải thích chi tiết các câu sai để củng cố nhé!";
+      } else {
+        document.getElementById('examResultDesc').innerText = "📖 Cần xem lại bài học! Hãy đọc kỹ giải thích chi tiết và thử sức lại lần nữa nhé!";
+      }
+
+      renderExamQuiz();
+      document.getElementById('examResultBanner').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function resetExam() {
+      examUserAnswers = {};
+      isExamSubmitted = false;
+      examFilter = 'all';
+      document.getElementById('examResultBanner').classList.add('hidden');
+      document.getElementById('btnExamWrong').classList.add('hidden');
+      document.getElementById('btnSubmitExam').classList.remove('hidden');
+      setExamFilter('all');
+      renderExamQuiz();
+      window.scrollTo({ top: 300, behavior: 'smooth' });
+    }
+
+    /* ========================================================
+       8. CHUYỂN ĐỔI CHẾ ĐỘ CHƠI (Game Mode Switcher)
+       ======================================================== */
+    function switchGameMode(mode) {
+      const tabArcade = document.getElementById('tabModeArcade');
+      const tabExam = document.getElementById('tabModeExam');
+      const viewArcade = document.getElementById('arcadeView');
+      const viewExam = document.getElementById('examView');
+
+      if (mode === 'arcade') {
+        tabArcade.className = "flex-1 max-w-[220px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg shadow-pink-600/30";
+        tabExam.className = "flex-1 max-w-[220px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700";
+        viewArcade.classList.remove('hidden');
+        viewExam.classList.add('hidden');
+        renderArcadeQuestion();
+      } else {
+        clearInterval(arcadeTimer);
+        tabExam.className = "flex-1 max-w-[220px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-gradient-to-r from-pink-600 to-rose-600 text-white shadow-lg shadow-pink-600/30";
+        tabArcade.className = "flex-1 max-w-[220px] py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-2 bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700";
+        viewArcade.classList.add('hidden');
+        viewExam.classList.remove('hidden');
+        renderExamQuiz();
+      }
+    }
+
+    // Khởi tạo ban đầu khi tải trang
+    window.addEventListener('DOMContentLoaded', () => {
+      renderArcadeQuestion();
+      renderExamQuiz();
+    });
+  </script>
+</body>
+</html>
